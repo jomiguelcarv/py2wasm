@@ -1,3 +1,4 @@
+README.md
 bsp_test.c
 pyproject.toml
 setup.py

@@ -35,4 +35,15 @@ def run_tests():
     rot = affinity.rotate(poly, 45)
     results.append(f"Rotate OK area={round(rot.area,2)}")
     
-    return "\\n".join(results)
+    return "\n".join(results)
+
+
+def respond_to_js(msg: str) -> str:
+    """Respond to JS messages."""
+    if msg == "hello":
+        return "world"
+    elif msg == "run_bsp":
+        # Optionally run the tests from JS
+        return run_tests()
+    else:
+        return f"Python received: {msg}"

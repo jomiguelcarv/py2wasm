@@ -1,43 +1,88 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Secure WASM Python App</title>
-    <!-- Use PyScript version corresponding to Pyodide 0.25.x -->
+    <title>BSP WASM JS-Python Demo</title>
     <link rel="stylesheet" href="https://pyscript.net/releases/2025.11.1/core.css" />
     <script type="module" src="https://pyscript.net/releases/2025.11.1/core.js"></script>
 </head>
 <body>
-    <h1>BSP Test com codigo ofuscado: python -> C -> Wasm</h1>
-    <div id="output" style="white-space: pre-wrap; font-family: monospace; background: #eee; padding: 10px;">
-        Loading WASM and heavily libraries... this may take a few seconds...
+    <h1>BSP WASM Test + JS-Python Hello World</h1>
+
+    <!-- Hello world test -->
+    <div>
+        <input type="text" id="hello-input" placeholder="Type 'hello'..." />
+        <button onclick="sendHello()">Send Hello</button>
     </div>
 
-    <!-- Configure PyScript -->
+    <!-- BSP WASM test -->
+    <div>
+        <button onclick="runBSP()">Run BSP Tests</button>
+    </div>
+
+    <div id="output" style="white-space: pre-wrap; font-family: monospace; background: #eee; padding: 10px; margin-top:10px;">
+        Loading WASM and Python...
+    </div>
+
+    <!-- PyScript config -->
     <py-config>
-        # Add your local wheel DIRECTLY to the packages list!
-        packages =[
-            "numpy", 
-            "networkx", 
-            "shapely", 
+        packages = [
+            "numpy",
+            "networkx",
+            "shapely",
             "scipy",
-            "./dist/bsp_test-1.0.0-cp313-cp313-pyodide_2025_0_wasm32.whl" 
+            "./dist/bsp_test-1.0.0-cp313-cp313-pyodide_2025_0_wasm32.whl"
         ]
     </py-config>
 
-    <py-script>
-        from pyscript import document
+    <!-- Python functions exposed to JS -->
+    <py-script id="pythonFunctions">
         import bsp_test
+        from pyscript import document, window
+        
+        def respond_to_js(msg: str) -> str:
+            if msg == "hello":
+                return "world"
+            elif msg == "run_bsp":
+                try:
+                    return bsp_test.run_tests()
+                except Exception as e:
+                    return f"Error in BSP test: {e}"
+            else:
+                return f"Python received: {msg}"
+        
+        # EXPORT TO JAVASCRIPT: Attach the function to the global window object
+        window.respond_to_js = respond_to_js
+        
+        document.getElementById("output").innerText = "WASM and Python ready!"
+            </py-script>
 
-        try:
-            # Execute your compiled C-extension
-            result = bsp_test.run_tests()
+    <script>
+        async function sendHello() {
+            // Check if Python has finished loading and exposed the function
+            if (typeof window.respond_to_js !== 'function') {
+                document.getElementById("output").innerText = "Python is not ready yet. Please wait...";
+                return;
+            }
+
+            let msg = document.getElementById("hello-input").value;
             
-            # Display result
-            document.getElementById("output").innerText = result
-            
-        except Exception as e:
-            document.getElementById("output").innerText = f"Error: {e}"
-    </py-script>
+            // Call the Python function as if it were a normal JS function
+            let reply = window.respond_to_js(msg);
+
+            document.getElementById("output").innerText = reply;
+        }
+
+        async function runBSP() {
+            if (typeof window.respond_to_js !== 'function') {
+                document.getElementById("output").innerText = "Python is not ready yet. Please wait...";
+                return;
+            }
+
+            // Call the Python function as if it were a normal JS function
+            let reply = window.respond_to_js('run_bsp');
+
+            document.getElementById("output").innerText = reply;
+        }
+    </script>
 </body>
 </html>
-
