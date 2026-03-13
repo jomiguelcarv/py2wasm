@@ -1,0 +1,7 @@
+bsp_test.c
+pyproject.toml
+setup.py
+bsp_test.egg-info/PKG-INFO
+bsp_test.egg-info/SOURCES.txt
+bsp_test.egg-info/dependency_links.txt
+bsp_test.egg-info/top_level.txt

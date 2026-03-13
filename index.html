@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure WASM Python App</title>
+    <!-- Use PyScript version corresponding to Pyodide 0.25.x -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2025.11.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2025.11.1/core.js"></script>
+</head>
+<body>
+    <h1>BSP Test com codigo ofuscado: python -> C -> Wasm</h1>
+    <div id="output" style="white-space: pre-wrap; font-family: monospace; background: #eee; padding: 10px;">
+        Loading WASM and heavily libraries... this may take a few seconds...
+    </div>
+
+    <!-- Configure PyScript -->
+    <py-config>
+        # Add your local wheel DIRECTLY to the packages list!
+        packages =[
+            "numpy", 
+            "networkx", 
+            "shapely", 
+            "scipy",
+            "./dist/bsp_test-1.0.0-cp313-cp313-pyodide_2025_0_wasm32.whl" 
+        ]
+    </py-config>
+
+    <!-- Look how much simpler the Python code is now -->
+    <py-script>
+        from pyscript import document
+        import bsp_test
+
+        try:
+            # Execute your compiled C-extension
+            result = bsp_test.run_tests()
+            
+            # Display result
+            document.getElementById("output").innerText = result
+            
+        except Exception as e:
+            document.getElementById("output").innerText = f"Error: {e}"
+    </py-script>
+</body>
+</html>
+
